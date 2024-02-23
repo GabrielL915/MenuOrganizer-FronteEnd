@@ -7,10 +7,11 @@ import {
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from "react-native";
-import GestureRecognizer, {
-  swipeDirections,
-} from "react-native-swipe-gestures";
+import GestureRecognizer from "react-native-swipe-gestures";
 
 export default function App() {
   const [day, setDay] = useState("Segunda");
@@ -56,39 +57,46 @@ export default function App() {
   };
 
   return (
-    <GestureRecognizer
-      onSwipeLeft={onSwipeLeft}
-      onSwipeRight={onSwipeRight}
-      config={config}
-      style={{
-        flex: 1,
-        backgroundColor: "#2D3142",
-      }}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.keyboardAvoidingViewContainer}
     >
-      <TouchableWithoutFeedback onPress={dismissKeyboard}>
-        <SafeAreaView style={styles.container}>
-          <View style={styles.dayCard}>
-            <Text style={styles.dayText}>{day}</Text>
-          </View>
-          <View style={styles.card}>
-            <TextInput
-              style={styles.input}
-              multiline
-              placeholder="Insira o almoço..."
-              placeholderTextColor="#A9A9A9"
-            />
-          </View>
-          <View style={styles.card}>
-            <TextInput
-              style={styles.input}
-              multiline
-              placeholder="Insira o jantar..."
-              placeholderTextColor="#A9A9A9"
-            />
-          </View>
-        </SafeAreaView>
-      </TouchableWithoutFeedback>
-    </GestureRecognizer>
+      <GestureRecognizer
+        onSwipeLeft={onSwipeLeft}
+        onSwipeRight={onSwipeRight}
+        config={config}
+        style={styles.gestureRecognizer}
+      >
+        <TouchableWithoutFeedback onPress={dismissKeyboard}>
+          <SafeAreaView style={styles.container}>
+            <ScrollView
+              style={styles.scrollView}
+              contentContainerStyle={styles.scrollViewContent}
+            >
+              <View style={styles.dayCard}>
+                <Text style={styles.dayText}>{day}</Text>
+              </View>
+              <View style={styles.card}>
+                <TextInput
+                  style={styles.input}
+                  multiline
+                  placeholder="Insira o almoço..."
+                  placeholderTextColor="#A9A9A9"
+                />
+              </View>
+              <View style={styles.card}>
+                <TextInput
+                  style={styles.input}
+                  multiline
+                  placeholder="Insira o jantar..."
+                  placeholderTextColor="#A9A9A9"
+                />
+              </View>
+            </ScrollView>
+          </SafeAreaView>
+        </TouchableWithoutFeedback>
+      </GestureRecognizer>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -118,7 +126,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: "#EF9227",
     borderWidth: 1,
-    marginBottom: 30,
+    marginBottom: 25,
   },
   input: {
     color: "#F1F2F6",
@@ -132,5 +140,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
     color: "#F1F2F6",
+  },
+  keyboardAvoidingViewContainer: {
+    flex: 1,
+  },
+  gestureRecognizer: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+    width: "100%",
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
