@@ -8,7 +8,9 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
-import GestureRecognizer, { swipeDirections } from "react-native-swipe-gestures";
+import GestureRecognizer, {
+  swipeDirections,
+} from "react-native-swipe-gestures";
 
 export default function App() {
   const [day, setDay] = useState("Segunda");
@@ -17,29 +19,46 @@ export default function App() {
   };
 
   const onSwipeLeft = () => {
-
-    const daysOfWeek = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+    Keyboard.dismiss();
+    const daysOfWeek = [
+      "Segunda",
+      "Terça",
+      "Quarta",
+      "Quinta",
+      "Sexta",
+      "Sábado",
+      "Domingo",
+    ];
     const currentIndex = daysOfWeek.indexOf(day);
     const newIndex = (currentIndex + 1) % daysOfWeek.length;
     setDay(daysOfWeek[newIndex]);
   };
 
   const onSwipeRight = () => {
-    const daysOfWeek = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
+    Keyboard.dismiss();
+    const daysOfWeek = [
+      "Segunda",
+      "Terça",
+      "Quarta",
+      "Quinta",
+      "Sexta",
+      "Sábado",
+      "Domingo",
+    ];
     const currentIndex = daysOfWeek.indexOf(day);
     const newIndex = (currentIndex - 1 + daysOfWeek.length) % daysOfWeek.length;
     setDay(daysOfWeek[newIndex]);
-  }
+  };
 
   const config = {
     velocityThreshold: 0.3,
-    directionalOffsetThreshold: 80
+    directionalOffsetThreshold: 80,
   };
 
   return (
     <GestureRecognizer
       onSwipeLeft={onSwipeLeft}
-      onSwipeRight={onSwipeRight} 
+      onSwipeRight={onSwipeRight}
       config={config}
       style={{
         flex: 1,
@@ -51,18 +70,22 @@ export default function App() {
           <View style={styles.dayCard}>
             <Text style={styles.dayText}>{day}</Text>
           </View>
-          <TextInput
-            style={styles.lunchCard}
-            multiline
-            placeholder="Insira o almoço..."
-            placeholderTextColor="#A9A9A9"
-          />
-          <TextInput
-            style={styles.dinnerCard}
-            multiline
-            placeholder="Insira o jantar..."
-            placeholderTextColor="#A9A9A9"
-          />
+          <View style={styles.card}>
+            <TextInput
+              style={styles.input}
+              multiline
+              placeholder="Insira o almoço..."
+              placeholderTextColor="#A9A9A9"
+            />
+          </View>
+          <View style={styles.card}>
+            <TextInput
+              style={styles.input}
+              multiline
+              placeholder="Insira o jantar..."
+              placeholderTextColor="#A9A9A9"
+            />
+          </View>
         </SafeAreaView>
       </TouchableWithoutFeedback>
     </GestureRecognizer>
@@ -86,7 +109,7 @@ const styles = StyleSheet.create({
     borderColor: "#5B6386",
     borderWidth: 0.5,
   },
-  lunchCard: {
+  card: {
     justifyContent: "flex-start",
     backgroundColor: "#5B6386",
     padding: 13,
@@ -96,20 +119,8 @@ const styles = StyleSheet.create({
     borderColor: "#EF9227",
     borderWidth: 1,
     marginBottom: 30,
-    color: "#F1F2F6",
-    fontSize: 20,
-    textAlignVertical: "top",
   },
-  dinnerCard: {
-    justifyContent: "flex-start",
-    backgroundColor: "#5B6386",
-    padding: 13,
-    width: "90%",
-    height: "40%",
-    borderRadius: 10,
-    borderColor: "#EF9227",
-    borderWidth: 1,
-    marginBottom: 30,
+  input: {
     color: "#F1F2F6",
     fontSize: 20,
     textAlignVertical: "top",
