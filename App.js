@@ -11,6 +11,7 @@ import {
   ScrollView,
   Platform,
   Dimensions,
+  Animated, // Importe Animated
 } from "react-native";
 import GestureRecognizer, {
   swipeDirections,
@@ -18,16 +19,12 @@ import GestureRecognizer, {
 
 export default function App() {
   const [dayIndex, setDayIndex] = useState(0);
-  const daysOfWeek = [
-    "Segunda",
-    "Terça",
-    "Quarta",
-    "Quinta",
-    "Sexta",
-    "Sábado",
-    "Domingo",
-  ];
+  const [swipeAttemptFailed, setSwipeAttemptFailed] = useState(false); // Novo estado
+  const daysOfWeek = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];
   const scrollRef = useRef();
+
+  // Novo: Animação para o feedback visual
+  const fadeAnim = useRef(new Animated.Value(1)).current; 
 
   const dismissKeyboard = () => {
     Keyboard.dismiss();
@@ -35,38 +32,40 @@ export default function App() {
 
   const onSwipeLeft = () => {
     dismissKeyboard();
-    if (dayIndex === daysOfWeek.length - 1) {
-      setDayIndex(0);
-      scrollRef.current?.scrollTo({
-        x: 0 * Dimensions.get("window").width,
-        animated: false,
-      });
-    } else {
-      const nextIndex = (dayIndex + 1) % daysOfWeek.length;
+    if (dayIndex < daysOfWeek.length - 1) {
+      setSwipeAttemptFailed(false);
+      const nextIndex = dayIndex + 1;
       setDayIndex(nextIndex);
       scrollRef.current?.scrollTo({
         x: nextIndex * Dimensions.get("window").width,
         animated: true,
       });
+    } else {
+      triggerSwipeFeedback();
     }
   };
 
   const onSwipeRight = () => {
     dismissKeyboard();
-    if (dayIndex === 0) {
-      setDayIndex(daysOfWeek.length - 1);
-      scrollRef.current?.scrollTo({
-        x: (daysOfWeek.length - 1) * Dimensions.get("window").width,
-        animated: false,
-      });
-    } else {
-      const nextIndex = (dayIndex - 1 + daysOfWeek.length) % daysOfWeek.length;
+    if (dayIndex > 0) {
+      setSwipeAttemptFailed(false);
+      const nextIndex = dayIndex - 1;
       setDayIndex(nextIndex);
       scrollRef.current?.scrollTo({
         x: nextIndex * Dimensions.get("window").width,
         animated: true,
       });
+    } else {
+      triggerSwipeFeedback();
     }
+  };
+
+  const triggerSwipeFeedback = () => {
+    setSwipeAttemptFailed(true);
+    Animated.sequence([
+      Animated.timing(fadeAnim, { toValue: 0.5, duration: 100, useNativeDriver: true }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 100, useNativeDriver: true }),
+    ]).start(() => setSwipeAttemptFailed(false));
   };
 
   const config = {
@@ -103,7 +102,7 @@ export default function App() {
               style={styles.scrollView}
             >
               {daysOfWeek.map((day, index) => (
-                <View key={index} style={styles.fullWidthContainer}>
+                <Animated.View key={index} style={[styles.fullWidthContainer, swipeAttemptFailed && { opacity: fadeAnim }]}>
                   <View style={styles.dayCard}>
                     <Text style={styles.dayText}>{day}</Text>
                   </View>
@@ -123,7 +122,7 @@ export default function App() {
                       placeholderTextColor="#A9A9A9"
                     />
                   </View>
-                </View>
+                </Animated.View>
               ))}
             </ScrollView>
           </SafeAreaView>
