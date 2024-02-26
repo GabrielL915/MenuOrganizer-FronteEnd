@@ -35,14 +35,38 @@ export default function App() {
 
   const onSwipeLeft = () => {
     dismissKeyboard();
-    setDayIndex((prevIndex) => (prevIndex + 1) % daysOfWeek.length);
+    if (dayIndex === daysOfWeek.length - 1) {
+      setDayIndex(0);
+      scrollRef.current?.scrollTo({
+        x: 0 * Dimensions.get("window").width,
+        animated: false,
+      });
+    } else {
+      const nextIndex = (dayIndex + 1) % daysOfWeek.length;
+      setDayIndex(nextIndex);
+      scrollRef.current?.scrollTo({
+        x: nextIndex * Dimensions.get("window").width,
+        animated: true,
+      });
+    }
   };
 
   const onSwipeRight = () => {
     dismissKeyboard();
-    setDayIndex(
-      (prevIndex) => (prevIndex - 1 + daysOfWeek.length) % daysOfWeek.length
-    );
+    if (dayIndex === 0) {
+      setDayIndex(daysOfWeek.length - 1);
+      scrollRef.current?.scrollTo({
+        x: (daysOfWeek.length - 1) * Dimensions.get("window").width,
+        animated: false,
+      });
+    } else {
+      const nextIndex = (dayIndex - 1 + daysOfWeek.length) % daysOfWeek.length;
+      setDayIndex(nextIndex);
+      scrollRef.current?.scrollTo({
+        x: nextIndex * Dimensions.get("window").width,
+        animated: true,
+      });
+    }
   };
 
   const config = {
@@ -170,7 +194,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   fullWidthContainer: {
-    width: Dimensions.get('window').width,
+    width: Dimensions.get("window").width,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
