@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,51 +10,52 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   Platform,
+  Dimensions,
 } from "react-native";
-import GestureRecognizer from "react-native-swipe-gestures";
+import GestureRecognizer, {
+  swipeDirections,
+} from "react-native-swipe-gestures";
 
 export default function App() {
-  const [day, setDay] = useState("Segunda");
+  const [dayIndex, setDayIndex] = useState(0);
+  const daysOfWeek = [
+    "Segunda",
+    "Terça",
+    "Quarta",
+    "Quinta",
+    "Sexta",
+    "Sábado",
+    "Domingo",
+  ];
+  const scrollRef = useRef();
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
 
   const onSwipeLeft = () => {
-    Keyboard.dismiss();
-    const daysOfWeek = [
-      "Segunda",
-      "Terça",
-      "Quarta",
-      "Quinta",
-      "Sexta",
-      "Sábado",
-      "Domingo",
-    ];
-    const currentIndex = daysOfWeek.indexOf(day);
-    const newIndex = (currentIndex + 1) % daysOfWeek.length;
-    setDay(daysOfWeek[newIndex]);
+    dismissKeyboard();
+    setDayIndex((prevIndex) => (prevIndex + 1) % daysOfWeek.length);
   };
 
   const onSwipeRight = () => {
-    Keyboard.dismiss();
-    const daysOfWeek = [
-      "Segunda",
-      "Terça",
-      "Quarta",
-      "Quinta",
-      "Sexta",
-      "Sábado",
-      "Domingo",
-    ];
-    const currentIndex = daysOfWeek.indexOf(day);
-    const newIndex = (currentIndex - 1 + daysOfWeek.length) % daysOfWeek.length;
-    setDay(daysOfWeek[newIndex]);
+    dismissKeyboard();
+    setDayIndex(
+      (prevIndex) => (prevIndex - 1 + daysOfWeek.length) % daysOfWeek.length
+    );
   };
 
   const config = {
     velocityThreshold: 0.3,
     directionalOffsetThreshold: 80,
   };
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({
+      x: dayIndex * Dimensions.get("window").width,
+      animated: true,
+    });
+  }, [dayIndex]);
 
   return (
     <KeyboardAvoidingView
@@ -70,28 +71,36 @@ export default function App() {
         <TouchableWithoutFeedback onPress={dismissKeyboard}>
           <SafeAreaView style={styles.container}>
             <ScrollView
+              ref={scrollRef}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              scrollEnabled={false}
               style={styles.scrollView}
-              contentContainerStyle={styles.scrollViewContent}
             >
-              <View style={styles.dayCard}>
-                <Text style={styles.dayText}>{day}</Text>
-              </View>
-              <View style={styles.card}>
-                <TextInput
-                  style={styles.input}
-                  multiline
-                  placeholder="Insira o almoço..."
-                  placeholderTextColor="#A9A9A9"
-                />
-              </View>
-              <View style={styles.card}>
-                <TextInput
-                  style={styles.input}
-                  multiline
-                  placeholder="Insira o jantar..."
-                  placeholderTextColor="#A9A9A9"
-                />
-              </View>
+              {daysOfWeek.map((day, index) => (
+                <View key={index} style={styles.fullWidthContainer}>
+                  <View style={styles.dayCard}>
+                    <Text style={styles.dayText}>{day}</Text>
+                  </View>
+                  <View style={styles.card}>
+                    <TextInput
+                      style={styles.input}
+                      multiline
+                      placeholder="Insira o almoço..."
+                      placeholderTextColor="#A9A9A9"
+                    />
+                  </View>
+                  <View style={styles.card}>
+                    <TextInput
+                      style={styles.input}
+                      multiline
+                      placeholder="Insira o jantar..."
+                      placeholderTextColor="#A9A9A9"
+                    />
+                  </View>
+                </View>
+              ))}
             </ScrollView>
           </SafeAreaView>
         </TouchableWithoutFeedback>
@@ -155,5 +164,15 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  animatedContainer: {
+    flex: 1,
+    width: "100%",
+  },
+  fullWidthContainer: {
+    width: Dimensions.get('window').width,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
